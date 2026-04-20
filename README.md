@@ -87,24 +87,9 @@ git clone <URL_DEL_REPOSITORIO>
 
 ---
 
-## 🌐 Despliegue
-
-El proyecto fue publicado utilizando GitHub Pages, permitiendo su acceso en línea.
-
-* URL del sitio: <URL_GITHUB_PAGES>
-* Repositorio: <URL_REPOSITORIO>
-
----
-
 ## ✅ Resultados
 
 Se logró cargar y visualizar correctamente un modelo 3D en formato FBX dentro de una escena web, así como manipular sus animaciones básicas.
-
----
-
-## 🧠 Conclusión
-
-Esta práctica permitió comprender cómo funcionan las aplicaciones de graficación 3D en la web mediante el uso de Three.js. Se adquirieron conocimientos sobre la carga de modelos, configuración de escenas y manejo de dependencias, además de reforzar el uso de Git y GitHub para el control de versiones y despliegue de aplicaciones.
 
 ---
 
