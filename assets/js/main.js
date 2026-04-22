@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-// Variables Globales
+// --- VARIABLES GLOBALES ---
 let scene, camera, renderer, controls, mixer, character, currentAction;
 const actions = {};
 const clock = new THREE.Clock();
 const container = document.getElementById('canvas-container');
 
-// Configuración de Animaciones
+// --- CONFIGURACIÓN DE ANIMACIONES ---
 const animConfig = [
     { key: '1', id: 'stab', file: 'Double Dagger Stab.fbx', label: 'STAB_ATTACK', loop: false },
     { key: '2', id: 'jump', file: 'Jump Attack.fbx', label: 'LEAP_JUMP', loop: false },
@@ -17,60 +17,62 @@ const animConfig = [
     { key: '5', id: 'crawl', file: 'Zombie Crawl.fbx', label: 'CRAWL_DRAG', loop: true }
 ];
 
-// Inicialización
 async function init() {
-    // 1. ESCENA Y NIEBLA (Profundidad)
+    // 1. ESCENA Y NIEBLA
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x07080a);
     scene.fog = new THREE.Fog(0x07080a, 400, 1200);
 
-    // 2. CÁMARA
-    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
-    camera.position.set(200, 250, 500);
+    // 2. CÁMARA (Near ajustado a 0.1 para permitir zoom extremo sin recortes)
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
+    
+    // POSICIÓN INICIAL: Más cerca del personaje (Z: 250 en lugar de 500)
+    camera.position.set(100, 180, 250); 
 
-    // 3. RENDERER (Configuración Pro)
+    // 3. RENDERER
     renderer = new THREE.WebGLRenderer({ 
         antialias: true, 
         powerPreference: "high-performance",
         alpha: true 
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización de rendimiento
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    // 4. LUCES (Dramatismo Cian/Neon)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // 4. LUCES DRAMÁTICAS
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    // Luz principal (Blanca)
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
     sunLight.position.set(100, 400, 100);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.mapSize.set(2048, 2048);
     scene.add(sunLight);
 
-    // Luz de Acento (Cian - Coincide con UI)
     const blueLight = new THREE.PointLight(0x00f2ff, 15, 600);
     blueLight.position.set(-150, 200, 50);
     scene.add(blueLight);
 
-    // 5. SUELO (Grid Tecnológico)
+    // 5. GRID TECNOLÓGICO
     const grid = new THREE.GridHelper(2000, 60, 0x00f2ff, 0x1a1a1f);
-    grid.material.opacity = 0.15;
+    grid.material.opacity = 0.1;
     grid.material.transparent = true;
     scene.add(grid);
 
-    // 6. CONTROLES (Suavizados)
+    // 6. CONTROLES DE CÁMARA (CONFIGURACIÓN DE ZOOM CERCANO)
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxDistance = 800;
-    controls.minDistance = 150;
-    controls.target.set(0, 100, 0);
+    
+    // LIMITES DE ZOOM: 
+    controls.minDistance = 40;  // Permite acercarse muchísimo al personaje
+    controls.maxDistance = 600; // Evita que el usuario se pierda en el vacío
+    
+    // PUNTO DE ENFOQUE: Centrado en el torso/pecho del modelo (Y: 120)
+    controls.target.set(0, 120, 0); 
 
     // 7. EVENTOS
     window.addEventListener('resize', onResize);
@@ -80,12 +82,10 @@ async function init() {
         btn.onclick = () => handleSwitch(btn.getAttribute('data-key'));
     });
 
-    // Iniciar carga de Assets
     loadEngine();
     animate();
 }
 
-// Carga de Archivos
 async function loadEngine() {
     const loader = new FBXLoader();
     const overlay = document.getElementById('loading-overlay');
@@ -100,10 +100,6 @@ async function loadEngine() {
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                // Ajuste de materiales para que reaccionen mejor a la luz
-                if(child.material) {
-                    child.material.shininess = 10;
-                }
             }
         });
         scene.add(character);
@@ -112,6 +108,7 @@ async function loadEngine() {
 
         // Carga Secuencial de Animaciones
         for (const config of animConfig) {
+            // Nota: Verifica que la ruta no tenga la barra invertida en el nombre de la carpeta
             const animFbx = await loader.loadAsync(`./assets/models/fbx/${config.file}`);
             const action = mixer.clipAction(animFbx.animations[0]);
             
@@ -119,44 +116,34 @@ async function loadEngine() {
                 action.loop = THREE.LoopOnce;
                 action.clampWhenFinished = true;
             }
-            
             actions[config.id] = action;
         }
 
-        // Finalizar Carga
         setTimeout(() => {
             overlay.classList.add('fade-out');
-            handleSwitch('3'); // Comenzar con Caminar
+            handleSwitch('3'); 
         }, 500);
 
     } catch (err) {
         console.error("CRITICAL_ENGINE_ERROR:", err);
-        const text = document.querySelector('.loading-text');
-        if(text) text.innerText = "ERROR: ASSETS NOT FOUND";
     }
 }
 
-// Lógica de Cambio de Animación
 function handleSwitch(key) {
     const config = animConfig.find(a => a.key === key);
     if (!config || !actions[config.id]) return;
 
-    // Actualizar Interfaz (Clase Active)
     document.querySelectorAll('.action-card').forEach(b => b.classList.remove('active'));
     const activeBtn = document.querySelector(`[data-key="${key}"]`);
     if(activeBtn) activeBtn.classList.add('active');
     
-    // Actualizar Etiqueta HUD
     const label = document.getElementById('current-label');
     if(label) label.innerText = config.label;
 
-    // Transición de Animación (Crossfade)
     const nextAction = actions[config.id];
     if (nextAction === currentAction) return;
     
-    if (currentAction) {
-        currentAction.fadeOut(0.3);
-    }
+    if (currentAction) currentAction.fadeOut(0.3);
 
     nextAction
         .reset()
@@ -168,29 +155,18 @@ function handleSwitch(key) {
     currentAction = nextAction;
 }
 
-// Redimensionamiento
 function onResize() {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    camera.aspect = width / height;
+    camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
-
-    renderer.setSize(width, height);
+    renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-// Bucle de Renderizado
 function animate() {
     requestAnimationFrame(animate);
-    
     const delta = clock.getDelta();
-    
     if (mixer) mixer.update(delta);
-    
     if (controls) controls.update();
-    
     renderer.render(scene, camera);
 }
 
-// Arrancar App
 init();
