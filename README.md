@@ -1,101 +1,138 @@
-# 🧊 Proyecto: Introducción a la Graficación 3D con Three.js / loader FBX
+# 🧊 THREEJS-3D-MODEL-PERSONAJE
 
 ## 📌 Descripción
 
-Este proyecto consiste en la implementación de un entorno básico de **graficación 3D** utilizando la librería **Three.js**, con el objetivo de comprender la carga, visualización y control de modelos tridimensionales en una aplicación web.
+Este proyecto consiste en una aplicación web que permite visualizar un **modelo 3D animado** utilizando la librería Three.js.
 
-Se trabajó específicamente con la carga de modelos en formato **FBX**, explorando su manipulación dentro de una escena 3D.
+El personaje fue obtenido desde Mixamo y se le integraron múltiples animaciones que pueden ser controladas mediante el teclado, permitiendo simular acciones tipo videojuego en tiempo real.
 
 ---
 
 ## 🎯 Objetivo
 
-Entender la lógica de carga y control de modelos 3D mediante el uso de librerías basadas en **WebGL**, específicamente con **Three.js**.
+* Implementar un entorno de graficación 3D en la web
+* Cargar modelos en formato FBX
+* Integrar múltiples animaciones en un mismo personaje
+* Controlar animaciones mediante el teclado
+* Aplicar transiciones suaves entre movimientos
 
 ---
 
-## ⚙️ Tecnologías utilizadas
+## 🛠️ Tecnologías utilizadas
 
-* HTML5
-* JavaScript
+* JavaScript (ES Modules)
 * Three.js
-* WebGL
-* Git y GitHub
+* FBXLoader
+* OrbitControls
+* Stats.js
 
 ---
 
 ## 📁 Estructura del proyecto
-INTRO-THREEJS-3D/
+
+```id="struct01"
+/THREEJS-3D-MODEL-PERSONAJE
 │
 ├── index.html
 ├── README.md
-├── assets/
-│   ├── build/
-│   │   ├── three.core.js
-│   │   └── three.module.js
-│   ├── css/
-│   │   └── main.css
-│   ├── img/
-│   │   └── favicon.png
-│   ├── js/
-│   │   └── main.js
-│   ├── jsm/
-│   │   ├── controls/
-│   │   │   └── OrbitControls.js
-│   │   ├── curves/
-│   │   │   ├── NURBSCurve.js
-│   │   │   └── NURBSUtils.js
-│   │   ├── libs/
-│   │   │   ├── fflate.module.js
-│   │   │   ├── lil-gui.module.min.js
-│   │   │   └── stats.module.js
-│   │   └── loaders/
-│   │       └── FBXLoader.js
-│   └── models/
-│       └── fbx/
-│           └── Samba Dancing.fbx
+└── assets/
+    ├── build/
+    │   ├── three.core.js
+    │   └── three.module.js
+    ├── css/
+    │   └── main.css
+    ├── img/
+    │   └── favicon.png
+    ├── js/
+    │   └── main.js
+    ├── jsm/
+    │   ├── controls/
+    │   ├── curves/
+    │   ├── libs/
+    │   └── loaders/
+    └── models/
+        └── fbx/
+            ├── character.fbx
+            ├── Double Dagger Stab.fbx
+            ├── Jump Attack.fbx
+            ├── Walk Forward Arc Right.fbx
+            ├── Zombie Biting.fbx
+            └── Zombie Crawl.fbx
+```
+
 ---
 
-## 🧩 Actividades realizadas
+## 🎮 Controles
 
-* Revisión del ejemplo FBX Loader en Three.js
-* Análisis del código fuente del ejemplo
-* Separación del proyecto en archivos organizados (HTML y JS)
-* Configuración de rutas a librerías necesarias
-* Descarga del repositorio completo de Three.js
-* Integración de archivos y dependencias al proyecto
-* Implementación de carga de modelo 3D (.fbx)
-* Ejecución local del proyecto
-* Modificación de animaciones/movimientos del modelo
-* Inicialización de repositorio local con Git
-* Subida del proyecto a GitHub
-* Publicación en GitHub Pages
+Las animaciones del personaje se controlan mediante el teclado:
+
+| Tecla | Animación              |
+| ----- | ---------------------- |
+| 1     | Double Dagger Stab     |
+| 2     | Jump Attack            |
+| 3     | Walk Forward Arc Right |
+| 4     | Zombie Biting          |
+| 5     | Zombie Crawl           |
+
+---
+
+## ⚙️ Funcionamiento
+
+1. Se carga un modelo 3D base (`character.fbx`)
+2. Se inicializa un `AnimationMixer` para gestionar animaciones
+3. Se cargan las animaciones de forma independiente
+4. Se almacenan en una lista en JavaScript
+5. Se activan mediante eventos de teclado
+6. Se aplican transiciones suaves con `crossFadeTo()`
+
+---
+
+## 🔄 Transiciones de animación
+
+El proyecto utiliza técnicas de interpolación para mejorar la experiencia visual:
+
+* `crossFadeTo()` para transiciones suaves
+* `LoopRepeat` para animaciones continuas (caminar)
+* `LoopOnce` para acciones (ataques)
+* `clampWhenFinished` para mantener la pose final
+
+---
+
+## ⚠️ Requisitos importantes
+
+* Todas las animaciones deben pertenecer al mismo rig del personaje
+* Las animaciones deben descargarse sin skin
+* El modelo principal debe incluir skin
+* Ejecutar el proyecto en un servidor local (ej. Live Server)
 
 ---
 
 ## 🚀 Ejecución del proyecto
 
-1. Clonar el repositorio:
-
-```
-git clone <URL_DEL_REPOSITORIO>
-```
-
-2. Abrir el archivo `index.html` en el navegador
-
-3. Verificar que el modelo 3D cargue correctamente
+1. Abrir el proyecto en Visual Studio Code
+2. Instalar la extensión Live Server
+3. Ejecutar el archivo `index.html`
+4. Esperar a que cargue el modelo
+5. Usar las teclas 1–5 para cambiar animaciones
 
 ---
 
-## ✅ Resultados
+## 💡 Posibles mejoras
 
-Se logró cargar y visualizar correctamente un modelo 3D en formato FBX dentro de una escena web, así como manipular sus animaciones básicas.
+* Movimiento del personaje con WASD
+* Cámara en tercera persona
+* Interfaz gráfica (botones)
+* Integración de sonidos
+* Sistema de estados (idle, run, attack)
 
 ---
 
-## 👤 Autor
+## 👨‍💻 Autor
 
-* Nombre del alumno: Michell Ostria Marinez
-* Materia: Graficación
-* Tema: Introducción a la Graficación 3D
-* Fecha: 16/04/2026
+Ostria Martinez Michell 
+
+---
+
+## 📚 Conclusión
+
+Este proyecto permite comprender los fundamentos de la graficación 3D en la web, el uso de modelos externos y la integración de múltiples animaciones en tiempo real, sentando bases para el desarrollo de aplicaciones interactivas o videojuegos.
